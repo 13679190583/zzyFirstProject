@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace：最主要的作用就是绑定mapper.xml与对应那个Mapper接口的关系，要求接口名称为：全限定名 -->
+<mapper namespace="com.example.zzyfirstproject.mapper.UserMapper">
+
+    <select id="selectAll" resultType="com.example.zzyfirstproject.entity.User">
+        select * from user
+    </select>
+
+    <select id="findUser" resultType="com.example.zzyfirstproject.entity.User" parameterType="integer">
+        select * ,user.id as userId from `user` where id = #{id}
+    </select>
+
+    <select id="selectById" resultType="com.example.zzyfirstproject.entity.User">
+        select * from user where id=#{id}
+    </select>
+
+    <insert id="insertToUser" useGeneratedKeys="true" keyProperty="id">
+        insert into user(id,user_name,password,gender,birthday,dept_Id)
+        values(#{id},#{userName},#{password},#{gender},#{birthday},#{deptId})
+    </insert>
+
+    <insert id="insertUserList" parameterType="com.example.zzyfirstproject.entity.User">
+        insert into `user`(id,user_name,password,gender,birthday,dept_Id)
+        values
+        <foreach collection="userList" item="u" separator=",">
+            (#{u.id},#{u.userName},#{u.password},#{u.gender},#{u.birthday},#{u.deptId})
+        </foreach>
+
+    </insert>
+
+    <update id = "updateUser" parameterType="com.example.zzyfirstproject.entity.User">
+        update `user` set user_name=#{userName},password=#{password},gender=#{gender},birthday=#{birthday},dept_id=#{deptId}
+        where id=#{id}
+    </update>
+
+    <delete id="delete">
+        delete from user where id=#{id}
+    </delete>
+
+    <delete id="batchDelete">
+        delete from user where id IN
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+
+
+    <!--    <select id="findUserToMap" resultType="map">-->
+    <!--        select * from user where id=#{id}-->
+    <!--    </select>-->
+
+    <select id="findUserAllToMap" resultType="map">
+        select * from user
+    </select>
+
+    <!--    <select id="selectUserLimit" resultType="com.fdzc.tfxfirstproject.entity.User">-->
+    <!--        select * from user limit #{startIndex},#{pageSize}-->
+    <!--    </select>-->
+
+    <!--    <insert id="insertToOne" useGeneratedKeys="true" keyProperty="id">-->
+    <!--        insert into user(user_name,password) values(#{userName},#{password})-->
+    <!--    </insert>-->
+
+
+    <select id="findUserDept" resultType="com.example.zzyfirstproject.vo.UserVo">
+        select  u.* , d.*
+        from
+            `user` u
+                left join
+            department d
+            on
+                u.dept_id = d.id ORDER BY u.id ASC ;
+    </select>
+
+
+
+</mapper>

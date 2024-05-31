@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace：最主要的作用就是绑定mapper.xml与对应那个Mapper接口的关系，要求接口名称为：全限定名 -->
+<mapper namespace="com.example.zzyfirstproject.mapper.DeptMapper">
+    <!-- DeptVo findDept(Integer id)  -->
+    <resultMap id="deptMap" type="com.example.zzyfirstproject.vo.DeptVo">
+        <id column="id" property="id"></id>
+        <result column="deptName" property="deptName"></result>
+        <result column="description" property="description"></result>
+        <result column="address" property="address"></result>
+        <collection property="users" ofType="com.example.zzyfirstproject.vo.UserVo">
+            <id column="userId" property="id"></id>
+            <result column="userName" property="userName"></result>
+            <result column="password" property="password"></result>
+            <result column="gender" property="gender"></result>
+            <result column="birthday" property="birthday"></result>
+            <result column="deptId" property="deptId"></result>
+        </collection>
+    </resultMap>
+
+    <insert id="insertDept" parameterType="com.example.zzyfirstproject.entity.Dept">
+        insert into department(id,dept_name,description,address)
+        values(#{id},#{deptName},#{description},#{address})
+    </insert>
+
+    <insert id="batchInsertDept" parameterType="com.example.zzyfirstproject.entity.Dept">
+        insert into department(id,dept_name,description,address)
+        values
+        <foreach collection="deptList" item="d" separator=",">
+            (#{d.id},#{d.deptName},#{d.description},#{d.address})
+        </foreach>
+    </insert>
+
+    <delete id="delete">
+        delete from department where id=#{id}
+    </delete>
+
+    <delete id="batchDeleteDept">
+        delete from department where id IN
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <update id = "updateDept" parameterType="com.example.zzyfirstproject.entity.Dept">
+        update `department` set dept_name=#{deptName},description=#{description},address=#{address}
+        where id=#{id}
+    </update>
+
+    <select id="findDept" resultType="com.example.zzyfirstproject.entity.Dept" parameterType="integer">
+        select * ,id as deptId from `department` where id = #{id}
+    </select>
+
+    <select id="findDeptAll" resultType="com.example.zzyfirstproject.entity.Dept">
+        select * from department
+    </select>
+
+    <select id="findUserDept" resultMap="deptMap">
+        select
+            d.id,
+            d.dept_name as deptName,
+            d.description,
+            d.address,
+            u.id as userId,
+            u.user_name as userName,
+            u.password,
+            u.gender,
+            u.birthday,
+            u.dept_id as deptId
+
+        from
+            department d
+                left join
+            user u
+            on
+                d.id = u.dept_id
+        where
+            d.id=#{id};
+    </select>
+</mapper>
